@@ -2,10 +2,12 @@ package com.poo.alquileres.controller;
 
 import com.poo.alquileres.model.Cliente;
 import com.poo.alquileres.model.DescuentoCliente;
+import com.poo.alquileres.model.HistorialCambioEstado;
 import com.poo.alquileres.model.enums.TipoEntidad;
 import com.poo.alquileres.persistence.repository.ClienteRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -16,7 +18,7 @@ public class ClienteController {
     private static ClienteController instance;
 
     private final ClienteRepository repository = new ClienteRepository();
-    private final HistorialController historial = HistorialController.getInstance();
+    private final HistorialController historialController = HistorialController.getInstance();
 
     private ClienteController() {
     }
@@ -33,14 +35,21 @@ public class ClienteController {
         if (dniCuit == null || dniCuit.isBlank()) {
             throw new IllegalArgumentException("El DNI/CUIT es obligatorio.");
         }
-        if (repository.findByDniCuit(dniCuit).isPresent()) {
-            throw new IllegalStateException("Ya existe un cliente con DNI/CUIT " + dniCuit);
+        // loop [recorrer clientes para validar DNI/CUIT]
+        for (Cliente clienteActual : repository.findAll()) {
+            if (clienteActual.coincideDniCuit(dniCuit)) {
+                throw new IllegalStateException("Ya existe un cliente con DNI/CUIT " + dniCuit);
+            }
         }
         Cliente cliente = new Cliente(dniCuit, nombreRazonSocial, telefono, email, direccion);
         cliente.activar();
-        repository.save(cliente);
-        historial.registrar(TipoEntidad.CLIENTE, dniCuit, "-",
-                cliente.getEstado().name(), usuario);
+        repository.save(cliente); // clientes.add(cliente)
+
+        HistorialCambioEstado historial = new HistorialCambioEstado(
+                LocalDateTime.now(), "-", cliente.getEstado().name(),
+                TipoEntidad.CLIENTE, dniCuit, usuario);
+        historial.asociarCliente(cliente);
+        historialController.agregarHistorial(historial);
         return cliente;
     }
 
@@ -59,7 +68,7 @@ public class ClienteController {
         String anterior = cliente.getEstado().name();
         cliente.activar();
         repository.save(cliente);
-        historial.registrar(TipoEntidad.CLIENTE, dniCuit, anterior,
+        historialController.registrar(TipoEntidad.CLIENTE, dniCuit, anterior,
                 cliente.getEstado().name(), usuario);
     }
 
@@ -68,7 +77,7 @@ public class ClienteController {
         String anterior = cliente.getEstado().name();
         cliente.inactivar();
         repository.save(cliente);
-        historial.registrar(TipoEntidad.CLIENTE, dniCuit, anterior,
+        historialController.registrar(TipoEntidad.CLIENTE, dniCuit, anterior,
                 cliente.getEstado().name(), usuario);
     }
 

@@ -28,7 +28,15 @@ public class HistorialController {
     }
 
     /**
-     * Registra un cambio de estado para auditoría.
+     * Persiste un historial ya construido y asociado (mensaje "agregarHistorial" del diagrama).
+     */
+    public HistorialCambioEstado agregarHistorial(HistorialCambioEstado historial) {
+        return repository.save(historial);
+    }
+
+    /**
+     * Conveniencia para los casos que no provienen de los UC literales (activar, inactivar,
+     * cambiarEstado de equipo, etc.): construye y persiste el historial en un paso.
      */
     public HistorialCambioEstado registrar(TipoEntidad tipoEntidad, String referencia,
                                            String estadoAnterior, String estadoNuevo,

@@ -61,4 +61,14 @@ public class Equipo {
     public void cambiarEstado(EstadoEquipo estadoNuevo) {
         this.estado = estadoNuevo;
     }
+
+    /** Indica si el código del equipo coincide con el buscado (nombre del diagrama). */
+    public boolean coincideCodigo(String codigo) {
+        return this.codigo != null && this.codigo.equals(codigo);
+    }
+
+    /** Indica si el equipo es del tipo de evento consultado (nombre del diagrama). */
+    public boolean coincideTipoEvento(TipoEquipo tipoEvento) {
+        return this.tipoEquipo == tipoEvento;
+    }
 }

@@ -18,26 +18,46 @@ import java.util.List;
 public abstract class Alquiler {
 
     private int id;
-    private String clienteDniCuit;
+    private Cliente cliente;
     private LocalDate fechaSolicitud;
     private LocalDate fechaEvento;
     private int cantidadDias;
     private EstadoAlquiler estado = EstadoAlquiler.INGRESADO;
     private double seniaAbonada;
+    private double recargo;
     private double porcentajeRecargoAplicado;
     private double importeTotal;
     private double importePendiente;
     private List<DetalleAlquiler> detalles = new ArrayList<>();
     private List<Pago> pagos = new ArrayList<>();
 
-    protected Alquiler(int id, LocalDate fechaEvento, int cantidadDias) {
-        this.id = id;
+    protected Alquiler(Cliente cliente, LocalDate fechaEvento, int cantidadDias, double recargo) {
+        this.cliente = cliente;
         this.fechaSolicitud = LocalDate.now();
         this.fechaEvento = fechaEvento;
         this.cantidadDias = cantidadDias;
+        this.recargo = recargo;
         this.estado = EstadoAlquiler.INGRESADO;
         this.detalles = new ArrayList<>();
         this.pagos = new ArrayList<>();
+    }
+
+    // ----- Accesores de dominio (nombres del diagrama de secuencia) -----
+
+    public Cliente obtenerCliente() {
+        return cliente;
+    }
+
+    public List<DetalleAlquiler> obtenerDetalles() {
+        return detalles;
+    }
+
+    public boolean coincideId(int idAlquiler) {
+        return this.id == idAlquiler;
+    }
+
+    public void cambiarEstado(EstadoAlquiler estadoNuevo) {
+        this.estado = estadoNuevo;
     }
 
     // ----- Composición -----

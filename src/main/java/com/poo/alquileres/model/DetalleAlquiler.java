@@ -18,9 +18,14 @@ public class DetalleAlquiler {
     private Equipo equipo;
 
     public DetalleAlquiler(Equipo equipo, int cantidad) {
+        this(equipo, cantidad, equipo != null ? equipo.getValorDiario() : 0.0);
+    }
+
+    /** Constructor con el valor diario explícito (firma del diagrama de secuencia). */
+    public DetalleAlquiler(Equipo equipo, int cantidad, double valorDiarioAplicado) {
         this.equipo = equipo;
         this.cantidad = cantidad;
-        this.valorDiarioAplicado = equipo != null ? equipo.getValorDiario() : 0.0;
+        this.valorDiarioAplicado = valorDiarioAplicado;
     }
 
     /**

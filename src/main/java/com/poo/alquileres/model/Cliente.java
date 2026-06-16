@@ -75,4 +75,9 @@ public class Cliente {
     public boolean estaActivo() {
         return estado == EstadoCliente.ACTIVO;
     }
+
+    /** Indica si el DNI/CUIT del cliente coincide con el buscado (nombre del diagrama). */
+    public boolean coincideDniCuit(String dniCuit) {
+        return this.dniCuit != null && this.dniCuit.equals(dniCuit);
+    }
 }

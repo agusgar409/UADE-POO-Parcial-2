@@ -13,12 +13,12 @@ public class AlquilerMasivo extends Alquiler {
     /** Recargo por defecto para alquileres masivos (%). */
     public static final double RECARGO_MASIVO = 10.0;
 
-    public AlquilerMasivo(int id, LocalDate fechaEvento, int cantidadDias) {
-        super(id, fechaEvento, cantidadDias);
+    public AlquilerMasivo(Cliente cliente, LocalDate fechaEvento, int cantidadDias, double recargo) {
+        super(cliente, fechaEvento, cantidadDias, recargo);
     }
 
     @Override
     public double obtenerPorcentajeRecargo() {
-        return RECARGO_MASIVO;
+        return getRecargo();
     }
 }
