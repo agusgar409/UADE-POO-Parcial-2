@@ -20,9 +20,6 @@ import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Panel de alta y listado de equipos. Solo interactúa con EquipoController (Singleton).
- */
 public class EquipoPanel extends JPanel {
 
     private static final String USUARIO = "ui";

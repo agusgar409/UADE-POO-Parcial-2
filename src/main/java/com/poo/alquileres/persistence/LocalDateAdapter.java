@@ -9,9 +9,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Serializa LocalDate como cadena ISO-8601 (yyyy-MM-dd) para Gson.
- */
 public class LocalDateAdapter extends TypeAdapter<LocalDate> {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;

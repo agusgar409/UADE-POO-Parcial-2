@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * Pago asociado a un alquiler (seña o saldo). Tiene su propio ciclo de estado.
- */
 @Data
 @NoArgsConstructor
 public class Pago {

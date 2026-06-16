@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Controller Singleton de equipos. Las vistas lo usan vía getInstance().
- */
 public class EquipoController {
 
     private static EquipoController instance;

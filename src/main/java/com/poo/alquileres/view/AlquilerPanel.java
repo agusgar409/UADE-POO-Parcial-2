@@ -23,9 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Panel del ciclo de vida de alquileres. Solo interactúa con AlquilerController (Singleton).
- */
 public class AlquilerPanel extends JPanel {
 
     private static final String USUARIO = "ui";

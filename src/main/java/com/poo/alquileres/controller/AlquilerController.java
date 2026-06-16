@@ -21,11 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Controller Singleton de alquileres. Orquesta el ciclo de vida completo: solicitud,
- * confirmación, preparación, entrega, finalización y cancelación. Coordina con los
- * repositorios de equipos y con la auditoría.
- */
 public class AlquilerController {
 
     private static AlquilerController instance;
@@ -35,7 +30,6 @@ public class AlquilerController {
     private final ClienteController clienteController = ClienteController.getInstance();
     private final HistorialController historialController = HistorialController.getInstance();
 
-    // Recargos configurables (atributos que el diagrama de clases ubicaba en Sistema).
     private double recargoMasivo = AlquilerMasivo.RECARGO_MASIVO;
     private double recargoCorporativo = AlquilerCorporativo.RECARGO_CORPORATIVO;
 
@@ -120,9 +114,6 @@ public class AlquilerController {
         return alquiler;
     }
 
-    /**
-     * Confirma el alquiler registrando la seña como un pago.
-     */
     public Alquiler confirmarAlquiler(int idAlquiler, double importeSenia,
                                       MedioPago medioPago, String usuario) {
         Alquiler alquiler = buscarPorId(idAlquiler);
@@ -202,9 +193,6 @@ public class AlquilerController {
         return importePendiente;
     }
 
-    /**
-     * Cancela el alquiler y libera el stock reservado.
-     */
     public Alquiler cancelarAlquiler(int idAlquiler, LocalDate fechaCancelacion, String usuario) {
         Alquiler alquiler = buscarPorId(idAlquiler);
         String anterior = alquiler.getEstado().name();
@@ -236,9 +224,6 @@ public class AlquilerController {
                 .toList();
     }
 
-    /**
-     * Total recaudado por pagos confirmados dentro del rango de fechas (inclusive).
-     */
     public double totalRecaudado(LocalDate fechaDesde, LocalDate fechaHasta) {
         return repository.findAll().stream()
                 .flatMap(a -> a.getPagos().stream())
@@ -248,17 +233,12 @@ public class AlquilerController {
                 .sum();
     }
 
-    /**
-     * Porcentaje neto aplicable al alquiler = recargo por tipo - descuento vigente del cliente.
-     */
     public double obtenerRecargoDescuentoAplicable(int idAlquiler) {
         Alquiler alquiler = buscarPorId(idAlquiler);
         double recargo = alquiler.obtenerPorcentajeRecargo();
         double descuento = descuentoVigente(alquiler, LocalDate.now());
         return recargo - descuento;
     }
-
-    // ----- Helpers -----
 
     private interface TransicionEstado {
         void aplicar(Alquiler alquiler);
@@ -278,13 +258,11 @@ public class AlquilerController {
         return alquiler.calcularImportePendiente(descuentoVigente(alquiler, LocalDate.now()));
     }
 
-    /** Descuento vigente del cliente del alquiler en la fecha indicada (0 si no aplica). */
     private double descuentoVigente(Alquiler alquiler, LocalDate fecha) {
         Cliente cliente = alquiler.getCliente();
         return cliente != null ? cliente.obtenerDescuentoVigente(fecha) : 0.0;
     }
 
-    /** Libera el stock reservado por cada detalle, persistiendo el equipo afectado. */
     private void liberarStockDeDetalles(Alquiler alquiler) {
         for (DetalleAlquiler detalle : alquiler.getDetalles()) {
             Equipo equipo = detalle.getEquipo();

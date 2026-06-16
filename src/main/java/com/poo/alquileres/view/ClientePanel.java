@@ -14,9 +14,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.List;
 
-/**
- * Panel de alta y listado de clientes. Solo interactúa con ClienteController (Singleton).
- */
 public class ClientePanel extends JPanel {
 
     private static final String USUARIO = "ui";

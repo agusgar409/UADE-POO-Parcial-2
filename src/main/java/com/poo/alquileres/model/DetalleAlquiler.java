@@ -4,10 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Línea de un alquiler: un equipo, la cantidad reservada y el valor diario aplicado
- * (se "congela" el valor diario al momento de la solicitud).
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,9 +24,6 @@ public class DetalleAlquiler {
         this.valorDiarioAplicado = valorDiarioAplicado;
     }
 
-    /**
-     * Subtotal de la línea = cantidad * valorDiarioAplicado * cantidadDias.
-     */
     public double calcularSubtotal(int cantidadDias) {
         return cantidad * valorDiarioAplicado * cantidadDias;
     }

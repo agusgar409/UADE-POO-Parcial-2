@@ -10,9 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Controller Singleton de clientes. Las vistas lo usan vía getInstance().
- */
 public class ClienteController {
 
     private static ClienteController instance;

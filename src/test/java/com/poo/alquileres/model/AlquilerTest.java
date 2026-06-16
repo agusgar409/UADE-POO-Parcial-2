@@ -22,7 +22,7 @@ public class AlquilerTest {
     }
 
     private Alquiler conUnDetalle(Alquiler alquiler) {
-        alquiler.agregarDetalle(new DetalleAlquiler(equipo, 2)); // 2 * 1000
+        alquiler.agregarDetalle(new DetalleAlquiler(equipo, 2));
         return alquiler;
     }
 
@@ -42,35 +42,32 @@ public class AlquilerTest {
     @Test
     public void calcularSubtotalSumaDetallesPorDias() {
         Alquiler alquiler = conUnDetalle(new AlquilerComun(cliente, LocalDate.now(), 3, 0.0));
-        // 2 * 1000 * 3 = 6000
         assertEquals(6000.0, alquiler.calcularSubtotal(), 0.001);
     }
 
     @Test
     public void importeTotalComunSinRecargoNiDescuento() {
-        Alquiler alquiler = conUnDetalle(new AlquilerComun(cliente, LocalDate.now(), 2, 0.0)); // subtotal 4000
+        Alquiler alquiler = conUnDetalle(new AlquilerComun(cliente, LocalDate.now(), 2, 0.0));
         assertEquals(4000.0, alquiler.calcularImporteTotal(0), 0.001);
     }
 
     @Test
     public void importeTotalMasivoAplicaRecargo() {
         Alquiler alquiler = conUnDetalle(
-                new AlquilerMasivo(cliente, LocalDate.now(), 1, 10.0)); // subtotal 2000
-        // 2000 + 10% = 2200
+                new AlquilerMasivo(cliente, LocalDate.now(), 1, 10.0));
         assertEquals(2200.0, alquiler.calcularImporteTotal(0), 0.001);
     }
 
     @Test
     public void importeTotalCorporativoConDescuentoCliente() {
         Alquiler alquiler = conUnDetalle(
-                new AlquilerCorporativo(cliente, LocalDate.now(), 1, 15.0)); // subtotal 2000
-        // 2000 + 15% recargo - 5% descuento = 2000 + 300 - 100 = 2200
+                new AlquilerCorporativo(cliente, LocalDate.now(), 1, 15.0));
         assertEquals(2200.0, alquiler.calcularImporteTotal(5), 0.001);
     }
 
     @Test
     public void importePendienteDescuentaSenia() {
-        Alquiler alquiler = conUnDetalle(new AlquilerComun(cliente, LocalDate.now(), 1, 0.0)); // subtotal 2000
+        Alquiler alquiler = conUnDetalle(new AlquilerComun(cliente, LocalDate.now(), 1, 0.0));
         alquiler.registrarSenia(500);
         assertEquals(1500.0, alquiler.calcularImportePendiente(0), 0.001);
     }
@@ -93,7 +90,7 @@ public class AlquilerTest {
     public void noSePuedeEntregarSinPreparar() {
         Alquiler alquiler = conUnDetalle(new AlquilerComun(cliente, LocalDate.now(), 1, 0.0));
         alquiler.confirmar();
-        alquiler.entregar(); // requiere EN_PREPARACION
+        alquiler.entregar();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -109,7 +106,6 @@ public class AlquilerTest {
     public void calcularHorasAnticipacion() {
         LocalDate evento = LocalDate.of(2026, 1, 11);
         Alquiler alquiler = new AlquilerComun(cliente, evento, 1, 0.0);
-        // del 10 al 11 = 24 horas
         assertEquals(24, alquiler.calcularHorasAnticipacion(LocalDate.of(2026, 1, 10)));
     }
 

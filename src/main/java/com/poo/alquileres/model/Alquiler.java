@@ -9,10 +9,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Alquiler de equipos para un evento. Clase abstracta: el porcentaje de recargo depende
- * del tipo concreto (Común, Masivo, Corporativo) -> polimorfismo.
- */
 @Data
 @NoArgsConstructor
 public abstract class Alquiler {
@@ -60,8 +56,6 @@ public abstract class Alquiler {
         this.estado = estadoNuevo;
     }
 
-    // ----- Composición -----
-
     public void agregarDetalle(DetalleAlquiler detalle) {
         if (detalles == null) {
             detalles = new ArrayList<>();
@@ -82,8 +76,6 @@ public abstract class Alquiler {
         }
         this.seniaAbonada += importe;
     }
-
-    // ----- Transiciones de estado -----
 
     public void confirmar() {
         exigirEstado(EstadoAlquiler.INGRESADO, "confirmar");
@@ -122,11 +114,6 @@ public abstract class Alquiler {
         }
     }
 
-    // ----- Cálculos -----
-
-    /**
-     * Suma de los subtotales de cada detalle por la cantidad de días.
-     */
     public double calcularSubtotal() {
         if (detalles == null) {
             return 0.0;
@@ -136,10 +123,6 @@ public abstract class Alquiler {
                 .sum();
     }
 
-    /**
-     * Importe total = subtotal + recargo - descuento del cliente.
-     * @param descuentoCliente porcentaje de descuento (0..100).
-     */
     public double calcularImporteTotal(double descuentoCliente) {
         double subtotal = calcularSubtotal();
         double porcentajeRecargo = obtenerPorcentajeRecargo();
@@ -151,17 +134,11 @@ public abstract class Alquiler {
         return this.importeTotal;
     }
 
-    /**
-     * Importe pendiente = total - seña abonada.
-     */
     public double calcularImportePendiente(double descuentoCliente) {
         this.importePendiente = calcularImporteTotal(descuentoCliente) - seniaAbonada;
         return this.importePendiente;
     }
 
-    /**
-     * Horas de anticipación entre la cancelación y el evento (útil para penalidades).
-     */
     public int calcularHorasAnticipacion(LocalDate fechaCancelacion) {
         if (fechaCancelacion == null || fechaEvento == null) {
             return 0;
@@ -172,8 +149,5 @@ public abstract class Alquiler {
         return (int) horas;
     }
 
-    /**
-     * Porcentaje de recargo según el tipo concreto de alquiler. Polimórfico.
-     */
     public abstract double obtenerPorcentajeRecargo();
 }

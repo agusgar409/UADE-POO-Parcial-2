@@ -13,9 +13,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Almacén genérico que lee/escribe una List&lt;T&gt; en un archivo JSON bajo la carpeta data/.
- */
 public class JsonStore<T> {
 
     private static final String DATA_DIR = "data";
@@ -24,11 +21,6 @@ public class JsonStore<T> {
     private final Type listType;
     private final Gson gson;
 
-    /**
-     * @param fileName nombre del archivo (ej. "clientes.json")
-     * @param listType tipo de la lista (new TypeToken&lt;List&lt;Cliente&gt;&gt;(){}.getType())
-     * @param gson     instancia de Gson configurada
-     */
     public JsonStore(String fileName, Type listType, Gson gson) {
         this.filePath = Paths.get(DATA_DIR, fileName);
         this.listType = listType;
@@ -58,7 +50,6 @@ public class JsonStore<T> {
         }
     }
 
-    /** Excepción no chequeada para fallos de persistencia. */
     public static class PersistenceException extends RuntimeException {
         public PersistenceException(String message, Throwable cause) {
             super(message, cause);

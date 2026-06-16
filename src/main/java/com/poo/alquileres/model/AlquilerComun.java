@@ -4,9 +4,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * Alquiler estándar: sin recargo por tipo (recargo = 0).
- */
 @NoArgsConstructor
 public class AlquilerComun extends Alquiler {
 

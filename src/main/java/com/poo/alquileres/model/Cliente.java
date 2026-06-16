@@ -8,9 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Cliente del sistema (persona física o jurídica). Identificado por DNI/CUIT.
- */
 @Data
 @NoArgsConstructor
 public class Cliente {
@@ -58,9 +55,6 @@ public class Cliente {
         descuentos.add(descuento);
     }
 
-    /**
-     * Devuelve el mayor porcentaje de descuento vigente en la fecha dada, o 0 si no hay.
-     */
     public double obtenerDescuentoVigente(LocalDate fecha) {
         if (descuentos == null) {
             return 0.0;
