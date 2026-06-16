@@ -122,13 +122,23 @@ public class AlquilerController {
     }
 
     /**
-     * Finaliza el alquiler y devuelve el importe pendiente que queda a cobrar.
+     * Finaliza el alquiler: controla la devolución liberando el stock de cada detalle,
+     * recalcula los importes con el descuento vigente a la fecha del evento y devuelve el
+     * importe pendiente que queda a cobrar.
      */
     public double finalizarAlquiler(int idAlquiler, String usuario) {
         Alquiler alquiler = buscarPorId(idAlquiler);
         String anterior = alquiler.getEstado().name();
+
+        // Control de devolución: liberar el stock reservado por cada detalle.
+        liberarStockDeDetalles(alquiler);
+
+        // Recalcular importes con el descuento vigente a la fecha del evento.
+        double descuento = descuentoVigente(alquiler, alquiler.getFechaEvento());
+        alquiler.calcularImporteTotal(descuento);
+        double pendiente = alquiler.calcularImportePendiente(descuento);
+
         alquiler.finalizar();
-        double pendiente = recalcular(alquiler);
 
         repository.save(alquiler);
         historial.registrar(TipoEntidad.ALQUILER, String.valueOf(idAlquiler),
@@ -144,15 +154,7 @@ public class AlquilerController {
         String anterior = alquiler.getEstado().name();
 
         alquiler.cancelar();
-        for (DetalleAlquiler detalle : alquiler.getDetalles()) {
-            Equipo equipo = detalle.getEquipo();
-            if (equipo != null) {
-                equipoRepository.findByCodigo(equipo.getCodigo()).ifPresent(persistido -> {
-                    persistido.liberarStock(detalle.getCantidad());
-                    equipoRepository.save(persistido);
-                });
-            }
-        }
+        liberarStockDeDetalles(alquiler);
 
         repository.save(alquiler);
         int horas = alquiler.calcularHorasAnticipacion(fechaCancelacion);
@@ -221,12 +223,28 @@ public class AlquilerController {
     }
 
     private double recalcular(Alquiler alquiler) {
-        double descuento = 0.0;
-        if (alquiler.getClienteDniCuit() != null) {
-            descuento = clienteController.obtenerDescuentoVigente(
-                    alquiler.getClienteDniCuit(), LocalDate.now());
+        return alquiler.calcularImportePendiente(descuentoVigente(alquiler, LocalDate.now()));
+    }
+
+    /** Descuento vigente del cliente del alquiler en la fecha indicada (0 si no aplica). */
+    private double descuentoVigente(Alquiler alquiler, LocalDate fecha) {
+        if (alquiler.getClienteDniCuit() == null) {
+            return 0.0;
         }
-        return alquiler.calcularImportePendiente(descuento);
+        return clienteController.obtenerDescuentoVigente(alquiler.getClienteDniCuit(), fecha);
+    }
+
+    /** Libera el stock reservado por cada detalle, persistiendo el equipo afectado. */
+    private void liberarStockDeDetalles(Alquiler alquiler) {
+        for (DetalleAlquiler detalle : alquiler.getDetalles()) {
+            Equipo equipo = detalle.getEquipo();
+            if (equipo != null) {
+                equipoRepository.findByCodigo(equipo.getCodigo()).ifPresent(persistido -> {
+                    persistido.liberarStock(detalle.getCantidad());
+                    equipoRepository.save(persistido);
+                });
+            }
+        }
     }
 
     private Alquiler crearSegunTipo(TipoAlquiler tipo, int id, LocalDate fechaEvento, int dias) {
