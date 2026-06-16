@@ -8,9 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Cliente del sistema (persona física o jurídica). Identificado por DNI/CUIT.
- */
 @Data
 @NoArgsConstructor
 public class Cliente {
@@ -58,9 +55,6 @@ public class Cliente {
         descuentos.add(descuento);
     }
 
-    /**
-     * Devuelve el mayor porcentaje de descuento vigente en la fecha dada, o 0 si no hay.
-     */
     public double obtenerDescuentoVigente(LocalDate fecha) {
         if (descuentos == null) {
             return 0.0;
@@ -74,5 +68,10 @@ public class Cliente {
 
     public boolean estaActivo() {
         return estado == EstadoCliente.ACTIVO;
+    }
+
+    /** Indica si el DNI/CUIT del cliente coincide con el buscado (nombre del diagrama). */
+    public boolean coincideDniCuit(String dniCuit) {
+        return this.dniCuit != null && this.dniCuit.equals(dniCuit);
     }
 }

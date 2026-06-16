@@ -9,38 +9,52 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Alquiler de equipos para un evento. Clase abstracta: el porcentaje de recargo depende
- * del tipo concreto (Común, Masivo, Corporativo) -> polimorfismo.
- */
 @Data
 @NoArgsConstructor
 public abstract class Alquiler {
 
     private int id;
-    private String clienteDniCuit;
+    private Cliente cliente;
     private LocalDate fechaSolicitud;
     private LocalDate fechaEvento;
     private int cantidadDias;
     private EstadoAlquiler estado = EstadoAlquiler.INGRESADO;
     private double seniaAbonada;
+    private double recargo;
     private double porcentajeRecargoAplicado;
     private double importeTotal;
     private double importePendiente;
     private List<DetalleAlquiler> detalles = new ArrayList<>();
     private List<Pago> pagos = new ArrayList<>();
 
-    protected Alquiler(int id, LocalDate fechaEvento, int cantidadDias) {
-        this.id = id;
+    protected Alquiler(Cliente cliente, LocalDate fechaEvento, int cantidadDias, double recargo) {
+        this.cliente = cliente;
         this.fechaSolicitud = LocalDate.now();
         this.fechaEvento = fechaEvento;
         this.cantidadDias = cantidadDias;
+        this.recargo = recargo;
         this.estado = EstadoAlquiler.INGRESADO;
         this.detalles = new ArrayList<>();
         this.pagos = new ArrayList<>();
     }
 
-    // ----- Composición -----
+    // ----- Accesores de dominio (nombres del diagrama de secuencia) -----
+
+    public Cliente obtenerCliente() {
+        return cliente;
+    }
+
+    public List<DetalleAlquiler> obtenerDetalles() {
+        return detalles;
+    }
+
+    public boolean coincideId(int idAlquiler) {
+        return this.id == idAlquiler;
+    }
+
+    public void cambiarEstado(EstadoAlquiler estadoNuevo) {
+        this.estado = estadoNuevo;
+    }
 
     public void agregarDetalle(DetalleAlquiler detalle) {
         if (detalles == null) {
@@ -62,8 +76,6 @@ public abstract class Alquiler {
         }
         this.seniaAbonada += importe;
     }
-
-    // ----- Transiciones de estado -----
 
     public void confirmar() {
         exigirEstado(EstadoAlquiler.INGRESADO, "confirmar");
@@ -102,11 +114,6 @@ public abstract class Alquiler {
         }
     }
 
-    // ----- Cálculos -----
-
-    /**
-     * Suma de los subtotales de cada detalle por la cantidad de días.
-     */
     public double calcularSubtotal() {
         if (detalles == null) {
             return 0.0;
@@ -116,10 +123,6 @@ public abstract class Alquiler {
                 .sum();
     }
 
-    /**
-     * Importe total = subtotal + recargo - descuento del cliente.
-     * @param descuentoCliente porcentaje de descuento (0..100).
-     */
     public double calcularImporteTotal(double descuentoCliente) {
         double subtotal = calcularSubtotal();
         double porcentajeRecargo = obtenerPorcentajeRecargo();
@@ -131,17 +134,11 @@ public abstract class Alquiler {
         return this.importeTotal;
     }
 
-    /**
-     * Importe pendiente = total - seña abonada.
-     */
     public double calcularImportePendiente(double descuentoCliente) {
         this.importePendiente = calcularImporteTotal(descuentoCliente) - seniaAbonada;
         return this.importePendiente;
     }
 
-    /**
-     * Horas de anticipación entre la cancelación y el evento (útil para penalidades).
-     */
     public int calcularHorasAnticipacion(LocalDate fechaCancelacion) {
         if (fechaCancelacion == null || fechaEvento == null) {
             return 0;
@@ -152,8 +149,5 @@ public abstract class Alquiler {
         return (int) horas;
     }
 
-    /**
-     * Porcentaje de recargo según el tipo concreto de alquiler. Polimórfico.
-     */
     public abstract double obtenerPorcentajeRecargo();
 }

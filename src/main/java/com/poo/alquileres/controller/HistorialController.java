@@ -7,10 +7,6 @@ import com.poo.alquileres.persistence.repository.HistorialRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Controller Singleton de auditoría. Centraliza el registro de cambios de estado de
- * cualquier entidad del sistema.
- */
 public class HistorialController {
 
     private static HistorialController instance;
@@ -28,8 +24,12 @@ public class HistorialController {
     }
 
     /**
-     * Registra un cambio de estado para auditoría.
+     * Persiste un historial ya construido y asociado (mensaje "agregarHistorial" del diagrama).
      */
+    public HistorialCambioEstado agregarHistorial(HistorialCambioEstado historial) {
+        return repository.save(historial);
+    }
+
     public HistorialCambioEstado registrar(TipoEntidad tipoEntidad, String referencia,
                                            String estadoAnterior, String estadoNuevo,
                                            String usuario) {

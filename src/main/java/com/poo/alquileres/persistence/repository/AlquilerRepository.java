@@ -9,10 +9,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Persistencia de alquileres en alquileres.json. Usa Gson con resolución de subtipos
- * (AlquilerComun/Masivo/Corporativo). Clave: id autoincremental.
- */
 public class AlquilerRepository {
 
     private static final Type LIST_TYPE = new TypeToken<List<Alquiler>>() {}.getType();
@@ -30,7 +26,6 @@ public class AlquilerRepository {
                 .findFirst();
     }
 
-    /** Próximo id disponible (max + 1). */
     public int nextId() {
         return findAll().stream()
                 .mapToInt(Alquiler::getId)
@@ -38,7 +33,6 @@ public class AlquilerRepository {
                 .orElse(0) + 1;
     }
 
-    /** Inserta o actualiza el alquiler (upsert por id). */
     public Alquiler save(Alquiler alquiler) {
         List<Alquiler> alquileres = findAll();
         alquileres.removeIf(a -> a.getId() == alquiler.getId());

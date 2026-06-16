@@ -9,9 +9,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Persistencia de equipos en equipos.json. Clave natural: codigo.
- */
 public class EquipoRepository {
 
     private static final Type LIST_TYPE = new TypeToken<List<Equipo>>() {}.getType();
@@ -29,7 +26,6 @@ public class EquipoRepository {
                 .findFirst();
     }
 
-    /** Inserta o actualiza el equipo (upsert por codigo). */
     public Equipo save(Equipo equipo) {
         List<Equipo> equipos = findAll();
         equipos.removeIf(e -> e.getCodigo() != null && e.getCodigo().equals(equipo.getCodigo()));

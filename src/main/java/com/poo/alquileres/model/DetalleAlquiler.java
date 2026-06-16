@@ -4,10 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Línea de un alquiler: un equipo, la cantidad reservada y el valor diario aplicado
- * (se "congela" el valor diario al momento de la solicitud).
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,14 +14,16 @@ public class DetalleAlquiler {
     private Equipo equipo;
 
     public DetalleAlquiler(Equipo equipo, int cantidad) {
-        this.equipo = equipo;
-        this.cantidad = cantidad;
-        this.valorDiarioAplicado = equipo != null ? equipo.getValorDiario() : 0.0;
+        this(equipo, cantidad, equipo != null ? equipo.getValorDiario() : 0.0);
     }
 
-    /**
-     * Subtotal de la línea = cantidad * valorDiarioAplicado * cantidadDias.
-     */
+    /** Constructor con el valor diario explícito (firma del diagrama de secuencia). */
+    public DetalleAlquiler(Equipo equipo, int cantidad, double valorDiarioAplicado) {
+        this.equipo = equipo;
+        this.cantidad = cantidad;
+        this.valorDiarioAplicado = valorDiarioAplicado;
+    }
+
     public double calcularSubtotal(int cantidadDias) {
         return cantidad * valorDiarioAplicado * cantidadDias;
     }

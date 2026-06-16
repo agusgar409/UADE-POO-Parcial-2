@@ -9,9 +9,6 @@ import com.poo.alquileres.persistence.JsonStore;
 import java.lang.reflect.Type;
 import java.util.List;
 
-/**
- * Persistencia de la auditoría de cambios de estado en historiales.json (append-only).
- */
 public class HistorialRepository {
 
     private static final Type LIST_TYPE = new TypeToken<List<HistorialCambioEstado>>() {}.getType();

@@ -1,24 +1,23 @@
 package com.poo.alquileres.controller;
 
 import com.poo.alquileres.model.Equipo;
+import com.poo.alquileres.model.HistorialCambioEstado;
 import com.poo.alquileres.model.enums.EstadoEquipo;
 import com.poo.alquileres.model.enums.TipoEntidad;
 import com.poo.alquileres.model.enums.TipoEquipo;
 import com.poo.alquileres.persistence.repository.EquipoRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Controller Singleton de equipos. Las vistas lo usan vía getInstance().
- */
 public class EquipoController {
 
     private static EquipoController instance;
 
     private final EquipoRepository repository = new EquipoRepository();
-    private final HistorialController historial = HistorialController.getInstance();
+    private final HistorialController historialController = HistorialController.getInstance();
 
     private EquipoController() {
     }
@@ -36,14 +35,20 @@ public class EquipoController {
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("El código del equipo es obligatorio.");
         }
-        if (repository.findByCodigo(codigo).isPresent()) {
-            throw new IllegalStateException("Ya existe un equipo con código " + codigo);
+        for (Equipo equipoActual : repository.findAll()) {
+            if (equipoActual.coincideCodigo(codigo)) {
+                throw new IllegalStateException("Ya existe un equipo con código " + codigo);
+            }
         }
         Equipo equipo = new Equipo(codigo, nombre, descripcion, tipoEquipo,
                 valorDiario, stockInicial, requiereInstalacion);
         repository.save(equipo);
-        historial.registrar(TipoEntidad.EQUIPO, codigo, "-",
-                equipo.getEstado().name(), usuario);
+
+        HistorialCambioEstado historial = new HistorialCambioEstado(
+                LocalDateTime.now(), "-", equipo.getEstado().name(),
+                TipoEntidad.EQUIPO, codigo, usuario);
+        historial.asociarEquipo(equipo);
+        historialController.agregarHistorial(historial);
         return equipo;
     }
 
@@ -65,10 +70,10 @@ public class EquipoController {
     public List<Equipo> consultarEquiposDisponibles(LocalDate fechaEvento, int cantidadDias,
                                                      TipoEquipo tipoEvento) {
         List<Equipo> disponibles = new ArrayList<>();
-        for (Equipo equipo : repository.findAll()) {
-            boolean coincideTipo = tipoEvento == null || equipo.getTipoEquipo() == tipoEvento;
-            if (coincideTipo && equipo.estaDisponible(1)) {
-                disponibles.add(equipo);
+        for (Equipo equipoActual : repository.findAll()) {
+            boolean coincideTipo = tipoEvento == null || equipoActual.coincideTipoEvento(tipoEvento);
+            if (coincideTipo && equipoActual.estaDisponible(1)) {
+                disponibles.add(equipoActual);
             }
         }
         return disponibles;
@@ -79,7 +84,7 @@ public class EquipoController {
         String anterior = equipo.getEstado().name();
         equipo.cambiarEstado(estadoNuevo);
         repository.save(equipo);
-        historial.registrar(TipoEntidad.EQUIPO, codigo, anterior,
+        historialController.registrar(TipoEntidad.EQUIPO, codigo, anterior,
                 equipo.getEstado().name(), usuario);
     }
 }

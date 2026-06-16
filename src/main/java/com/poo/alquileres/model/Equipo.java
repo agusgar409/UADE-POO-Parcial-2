@@ -5,9 +5,6 @@ import com.poo.alquileres.model.enums.TipoEquipo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Equipo disponible para alquiler. Se identifica por su código.
- */
 @Data
 @NoArgsConstructor
 public class Equipo {
@@ -33,9 +30,6 @@ public class Equipo {
         this.requiereInstalacion = requiereInstalacion;
     }
 
-    /**
-     * Hay disponibilidad si el equipo está DISPONIBLE y el stock alcanza la cantidad pedida.
-     */
     public boolean estaDisponible(int cantidad) {
         return estado == EstadoEquipo.DISPONIBLE && stockDisponible >= cantidad;
     }
@@ -60,5 +54,15 @@ public class Equipo {
 
     public void cambiarEstado(EstadoEquipo estadoNuevo) {
         this.estado = estadoNuevo;
+    }
+
+    /** Indica si el código del equipo coincide con el buscado (nombre del diagrama). */
+    public boolean coincideCodigo(String codigo) {
+        return this.codigo != null && this.codigo.equals(codigo);
+    }
+
+    /** Indica si el equipo es del tipo de evento consultado (nombre del diagrama). */
+    public boolean coincideTipoEvento(TipoEquipo tipoEvento) {
+        return this.tipoEquipo == tipoEvento;
     }
 }

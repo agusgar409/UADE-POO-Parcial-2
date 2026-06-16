@@ -9,9 +9,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Persistencia de clientes en clientes.json. Clave natural: dniCuit.
- */
 public class ClienteRepository {
 
     private static final Type LIST_TYPE = new TypeToken<List<Cliente>>() {}.getType();
@@ -29,7 +26,6 @@ public class ClienteRepository {
                 .findFirst();
     }
 
-    /** Inserta o actualiza el cliente (upsert por dniCuit). */
     public Cliente save(Cliente cliente) {
         List<Cliente> clientes = findAll();
         clientes.removeIf(c -> c.getDniCuit() != null && c.getDniCuit().equals(cliente.getDniCuit()));

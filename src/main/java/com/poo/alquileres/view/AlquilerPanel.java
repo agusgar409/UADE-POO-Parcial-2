@@ -23,9 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Panel del ciclo de vida de alquileres. Solo interactúa con AlquilerController (Singleton).
- */
 public class AlquilerPanel extends JPanel {
 
     private static final String USUARIO = "ui";
@@ -196,8 +193,9 @@ public class AlquilerPanel extends JPanel {
     private void refrescar() {
         tableModel.setRowCount(0);
         for (Alquiler a : controller.listarAlquileres()) {
+            String dni = a.getCliente() != null ? a.getCliente().getDniCuit() : "";
             tableModel.addRow(new Object[]{
-                    a.getId(), a.getClienteDniCuit(),
+                    a.getId(), dni,
                     a.getClass().getSimpleName().replace("Alquiler", ""),
                     a.getEstado(), a.getPorcentajeRecargoAplicado(),
                     a.getImporteTotal(), a.getImportePendiente()});

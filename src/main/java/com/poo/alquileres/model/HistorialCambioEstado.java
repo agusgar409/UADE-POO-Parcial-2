@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Registro de auditoría de un cambio de estado. Cada historial corresponde a una sola
- * entidad afectada; se conserva tipoEntidad y referencia como datos de auditoría.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,4 +18,26 @@ public class HistorialCambioEstado {
     private TipoEntidad tipoEntidad;
     private String referencia;
     private String usuarioResponsable;
+
+    // ----- Asociación con la entidad afectada (nombres del diagrama de secuencia) -----
+
+    public void asociarCliente(Cliente cliente) {
+        this.tipoEntidad = TipoEntidad.CLIENTE;
+        this.referencia = cliente != null ? cliente.getDniCuit() : null;
+    }
+
+    public void asociarEquipo(Equipo equipo) {
+        this.tipoEntidad = TipoEntidad.EQUIPO;
+        this.referencia = equipo != null ? equipo.getCodigo() : null;
+    }
+
+    public void asociarAlquiler(Alquiler alquiler) {
+        this.tipoEntidad = TipoEntidad.ALQUILER;
+        this.referencia = alquiler != null ? String.valueOf(alquiler.getId()) : null;
+    }
+
+    public void asociarPago(Pago pago) {
+        this.tipoEntidad = TipoEntidad.PAGO;
+        this.referencia = pago != null ? String.valueOf(pago.getId()) : null;
+    }
 }

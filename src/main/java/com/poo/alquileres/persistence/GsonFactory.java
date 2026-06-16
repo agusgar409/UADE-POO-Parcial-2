@@ -10,21 +10,15 @@ import com.poo.alquileres.model.AlquilerMasivo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Construye instancias de Gson configuradas para el dominio: adaptadores de fecha y
- * polimorfismo de la jerarquía Alquiler.
- */
 public final class GsonFactory {
 
     private GsonFactory() {
     }
 
-    /** Gson base con soporte para java.time y formato legible. */
     public static Gson base() {
         return baseBuilder().create();
     }
 
-    /** Gson que además resuelve los subtipos de Alquiler mediante el campo "tipo". */
     public static Gson conAlquileres() {
         RuntimeTypeAdapterFactory<Alquiler> alquilerFactory =
                 RuntimeTypeAdapterFactory.of(Alquiler.class, "tipo")

@@ -15,12 +15,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Panel de alta y listado de equipos. Solo interactúa con EquipoController (Singleton).
- */
 public class EquipoPanel extends JPanel {
 
     private static final String USUARIO = "ui";
@@ -44,11 +43,65 @@ public class EquipoPanel extends JPanel {
     };
     private final JTable tabla = new JTable(tableModel);
 
+    private final JComboBox<Object> cboFiltroTipo =
+            new JComboBox<>(construirOpcionesFiltro());
+    private final JTextField txtFechaEvento =
+            new JTextField(LocalDate.now().plusDays(7).toString());
+    private final JTextField txtDias = new JTextField("1");
+
     public EquipoPanel() {
         setLayout(new BorderLayout(8, 8));
         add(construirFormulario(), BorderLayout.NORTH);
         add(new JScrollPane(tabla), BorderLayout.CENTER);
+        add(construirConsulta(), BorderLayout.SOUTH);
         refrescar();
+    }
+
+    private static Object[] construirOpcionesFiltro() {
+        Object[] tipos = TipoEquipo.values();
+        Object[] opciones = new Object[tipos.length + 1];
+        opciones[0] = "(todos)";
+        System.arraycopy(tipos, 0, opciones, 1, tipos.length);
+        return opciones;
+    }
+
+    private JPanel construirConsulta() {
+        JPanel consulta = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        consulta.add(new JLabel("Tipo:"));
+        consulta.add(cboFiltroTipo);
+        consulta.add(new JLabel("Fecha evento:"));
+        consulta.add(txtFechaEvento);
+        consulta.add(new JLabel("Días:"));
+        consulta.add(txtDias);
+
+        JButton btnConsultar = new JButton("Consultar disponibles");
+        btnConsultar.addActionListener(e -> consultarDisponibles());
+        consulta.add(btnConsultar);
+        JButton btnVerTodos = new JButton("Ver todos");
+        btnVerTodos.addActionListener(e -> refrescar());
+        consulta.add(btnVerTodos);
+        return consulta;
+    }
+
+    private void consultarDisponibles() {
+        try {
+            Object seleccion = cboFiltroTipo.getSelectedItem();
+            TipoEquipo tipoEvento = (seleccion instanceof TipoEquipo te) ? te : null;
+            List<Equipo> disponibles = controller.consultarEquiposDisponibles(
+                    LocalDate.parse(txtFechaEvento.getText().trim()),
+                    Integer.parseInt(txtDias.getText().trim()),
+                    tipoEvento);
+            volcar(disponibles);
+            if (disponibles.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay equipos disponibles para ese filtro.");
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Los días deben ser numéricos.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private JPanel construirFormulario() {
@@ -101,8 +154,11 @@ public class EquipoPanel extends JPanel {
     }
 
     private void refrescar() {
+        volcar(controller.listarEquipos());
+    }
+
+    private void volcar(List<Equipo> equipos) {
         tableModel.setRowCount(0);
-        List<Equipo> equipos = controller.listarEquipos();
         for (Equipo e : equipos) {
             tableModel.addRow(new Object[]{
                     e.getCodigo(), e.getNombre(), e.getTipoEquipo(), e.getEstado(),
