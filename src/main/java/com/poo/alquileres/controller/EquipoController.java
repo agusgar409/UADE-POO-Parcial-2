@@ -41,7 +41,7 @@ public class EquipoController {
         Equipo equipo = new Equipo(codigo, nombre, descripcion, tipoEquipo,
                 valorDiario, stockInicial, requiereInstalacion);
         repository.save(equipo);
-        historial.registrar(TipoEntidad.EQUIPO, codigo, null,
+        historial.registrar(TipoEntidad.EQUIPO, codigo, "-",
                 equipo.getEstado().name(), usuario);
         return equipo;
     }
