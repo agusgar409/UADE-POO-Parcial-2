@@ -7,6 +7,7 @@ import com.poo.alquileres.model.enums.TipoEquipo;
 import com.poo.alquileres.persistence.repository.EquipoRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,16 +58,20 @@ public class EquipoController {
     }
 
     /**
-     * Equipos disponibles (estado DISPONIBLE y stock suficiente) para la cantidad pedida,
-     * filtrando opcionalmente por tipo. fechaEvento/cantidadDias se reciben por compatibilidad
-     * con la firma del enunciado (la disponibilidad se evalúa sobre el stock vigente).
+     * Equipos del tipo pedido que tengan al menos una unidad disponible para el evento.
+     * Sigue el UC5: por cada equipo se valida que coincida el tipo y que esté disponible
+     * (estaDisponible(1)). fechaEvento/cantidadDias se reciben según la firma del enunciado.
      */
-    public List<Equipo> consultarEquiposDisponibles(LocalDate fechaEvento, int cantidad,
-                                                     TipoEquipo tipo) {
-        return repository.findAll().stream()
-                .filter(e -> tipo == null || e.getTipoEquipo() == tipo)
-                .filter(e -> e.estaDisponible(cantidad))
-                .toList();
+    public List<Equipo> consultarEquiposDisponibles(LocalDate fechaEvento, int cantidadDias,
+                                                     TipoEquipo tipoEvento) {
+        List<Equipo> disponibles = new ArrayList<>();
+        for (Equipo equipo : repository.findAll()) {
+            boolean coincideTipo = tipoEvento == null || equipo.getTipoEquipo() == tipoEvento;
+            if (coincideTipo && equipo.estaDisponible(1)) {
+                disponibles.add(equipo);
+            }
+        }
+        return disponibles;
     }
 
     public void cambiarEstado(String codigo, EstadoEquipo estadoNuevo, String usuario) {
