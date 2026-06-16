@@ -64,14 +64,21 @@ public class AlquilerController {
                 fechaEvento, cantidadDias);
         alquiler.setClienteDniCuit(dniCuit);
 
-        // Reserva de stock y armado de detalles.
+        // Recorrer items solicitados: ubicar el equipo, validar disponibilidad y armar el detalle.
         for (ItemSolicitado item : itemsSolicitados) {
             Equipo equipo = equipoRepository.findByCodigo(item.codigoEquipo())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "No existe equipo con código " + item.codigoEquipo()));
-            equipo.reservarStock(item.cantidad());
-            equipoRepository.save(equipo);
-            alquiler.agregarDetalle(new DetalleAlquiler(equipo, item.cantidad()));
+
+            if (equipo.estaDisponible(item.cantidad())) {
+                DetalleAlquiler detalle = new DetalleAlquiler(equipo, item.cantidad());
+                alquiler.agregarDetalle(detalle);
+                equipo.reservarStock(item.cantidad());
+                equipoRepository.save(equipo);
+            } else {
+                throw new IllegalStateException(
+                        "Equipo no disponible para la cantidad pedida: " + equipo.getNombre());
+            }
         }
 
         double descuento = cliente.obtenerDescuentoVigente(LocalDate.now());
@@ -79,7 +86,7 @@ public class AlquilerController {
 
         repository.save(alquiler);
         historial.registrar(TipoEntidad.ALQUILER, String.valueOf(alquiler.getId()),
-                null, alquiler.getEstado().name(), usuario);
+                "-", alquiler.getEstado().name(), usuario);
         return alquiler;
     }
 
